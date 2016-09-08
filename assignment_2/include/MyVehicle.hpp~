@@ -1,0 +1,19 @@
+#ifndef MTRN3500_MY_VEHICLE_H
+#define MTRN3500_MY_VEHICLE_H
+
+#include "Vehicle.hpp"
+
+class MyVehicle : public Vehicle{
+
+public:
+  MyVehicle();
+  ~MyVehicle();
+
+  void draw();
+  
+protected:
+  
+
+};
+
+#endif
