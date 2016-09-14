@@ -373,9 +373,31 @@ void idle() {
 								// uncomment the line below to create remote vehicles
 								otherVehicles[vm.remoteID] = new MyVehicle();
 
-								//
-								// more student code goes here
-								//
+								//INCOMPLETE
+								for (int j = 0; j < vm.shapes.size(); j++){
+
+								  double x = vm.shapes[j].xyz[0];
+								  double y = vm.shapes[j].xyz[1];
+								  double z = vm.shapes[j].xyz[2];
+								  double rotation = vm.shapes[j].rotation;
+
+								  switch(vm.shapes[i].type){
+								  case RECTANGULAR_PRISM:
+								    RectangularPrism * tempShape = new RectangularPrism(x,y,z,rotation);
+								    tempShape->set_x_length(vm.shapes[j].params.rect.xlen);
+								    tempShape->set_y_length(vm.shapes[j].params.rect.ylen);
+								    tempShape->set_z_length(vm.shapes[j].params.rect.zlen);
+								    otherVehicles[vm.remoteID].addShape(tempShape);
+								    ~tempShape();
+								    break;
+								  case TRIANGULAR_PRISM:
+								  case TRAPEZOIDAL_PRISM:
+								  case CYLINDER:
+								  default:
+
+								  }
+
+								}
 							}
 							break;
 						}

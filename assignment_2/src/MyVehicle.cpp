@@ -65,7 +65,7 @@ void MyVehicle::draw(){
   positionInGL();
 
   for(int i = 0; i < 4; i++){
-       dynamic_cast<Wheel*>(shapes[i])->set_wheel_rotation(wheel_angle);
+       dynamic_cast<Wheel*>(shapes[i])->set_wheel_rotation(-wheel_angle);
     }
   shapes[0]->setRotation(-getSteering());
   shapes[1]->setRotation(-getSteering()+180);
