@@ -47,7 +47,7 @@ void Cylinder::draw(){
   glTranslated(x,y,z);
   glRotated(-90, 1, 0, 0);
   glTranslated(0,0,radius);
-  glRotated(rotation,0,1,0);
+  glRotated(rotation,0,0,1);
 
   glColor3f(red, green, blue);
   

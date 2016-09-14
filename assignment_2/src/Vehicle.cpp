@@ -25,6 +25,9 @@ void Vehicle::update(double dt)
 	// update heading
 	rotation += dt * steering * speed;
 
+        //update - MAGIC NUMBER ATM, NEED WHEEL RADIUS PARAM
+	wheel_angle += dt * speed/0.4 * 180;
+	
 	while (rotation > 360) rotation -= 360;
 	while (rotation < 0) rotation += 360;
 

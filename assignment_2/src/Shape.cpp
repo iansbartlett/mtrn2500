@@ -108,6 +108,6 @@ double Shape::getBlue() {
 void Shape::setColor(float red_, float green_, float blue_) {
 	red = red_;
 	green = green_;
-	blue = blue_;
+	blue =blue_;
 };
 

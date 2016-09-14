@@ -1,5 +1,5 @@
 #include "MyVehicle.hpp"
-#include "Cylinder.hpp"
+#include "Wheel.hpp"
 #include "RectangularPrism.hpp"
 #include "Shape.hpp"
 
@@ -10,11 +10,14 @@
 MyVehicle::MyVehicle() : Vehicle() {
   glPushMatrix(); 
   //Create basic structures
-  addShape(new Cylinder(1.1, 0.4, 1.05));
-  addShape(new Cylinder(1.1, 0.4, -1.05));
-  addShape(new Cylinder(-1.1, 0.4, 1.05));
-  addShape(new Cylinder(-1.1, 0.4, -1.05));
-  addShape(new RectangularPrism(0, 0.4, 0));
+  addShape(new Wheel(1.1, 0.4, 1.05));
+  addShape(new Wheel(1.1, 0.4, -1.05));
+  addShape(new Wheel(-1.1, 0.4, 1.05));
+  addShape(new Wheel(-1.1, 0.4, -1.05));
+  addShape(new RectangularPrism(0, 0.8, 0));
+  dynamic_cast<Wheel*>(shapes[1])->setRotation(90);
+  dynamic_cast<Wheel*>(shapes[3])->setRotation(180);
+  /*
   dynamic_cast<Cylinder*>(shapes[0])->set_radius(0.4);
   dynamic_cast<Cylinder*>(shapes[0])->set_y_length(0.1);
   dynamic_cast<Cylinder*>(shapes[1])->set_radius(0.4);
@@ -23,6 +26,7 @@ MyVehicle::MyVehicle() : Vehicle() {
   dynamic_cast<Cylinder*>(shapes[2])->set_y_length(0.1);
   dynamic_cast<Cylinder*>(shapes[3])->set_radius(0.8);
   dynamic_cast<Cylinder*>(shapes[3])->set_y_length(0.1);
+  */
   //Set chassis sizes
   dynamic_cast<RectangularPrism*>(shapes[4])->set_x_length(3.0);
   dynamic_cast<RectangularPrism*>(shapes[4])->set_y_length(1.0);
@@ -32,74 +36,41 @@ MyVehicle::MyVehicle() : Vehicle() {
   shapes[1]->setColor(0,0,1);
   shapes[2]->setColor(0,0,1);
   shapes[3]->setColor(0,0,1);
-  
+
+  wheel_angle = 0;
   
   glPopMatrix();
  
-};
-/*
-MyVehicle::MyVehicle(double x_, double y_, double z_){
- 
-  glPushMatrix(); 
-  glTranslated(x,y,z);
-  //Create basic structures
-  f_wheel_1 = new Cylinder(1.1, 0.4, 1.05);
-  f_wheel_2 = new Cylinder(1.1, 0.4, -1.05);
-  r_wheel_1 = new Cylinder(-1.1, 0.8, 1.05);
-  r_wheel_2 = new Cylinder(-1.1, 0.8, -1.05);
-  chassis = new RectangularPrism(0, 0, 0.4);
-  //Create wheel sizes
-  f_wheel_1->set_radius(0.4);
-  f_wheel_1->set_y_length(0.1);
-  f_wheel_2->set_radius(0.4);
-  f_wheel_2->set_y_length(0.1);
-  r_wheel_1->set_radius(0.8);
-  r_wheel_1->set_y_length(0.1);
-  r_wheel_2->set_radius(0.8);
-  r_wheel_2->set_y_length(0.1);
-  //Set chassis sizes
-  chassis->set_x_length(3.0);
-  chassis->set_y_length(1.0);
-  chassis->set_z_length(2.0);
-  glPopMatrix();
-  
 };
 
-MyVehicle::MyVehicle(double x_, double y_, double z_, double rotation_){
+/*
+MyVehicle::MyVehicle(vehicleShapes) : Vehicle() {
   
   glPushMatrix(); 
-  glTranslated(x,y,z);
-  glRotated(rotation,0,1,0);
-  //Create basic structures
-  f_wheel_1 = new Cylinder(1.1, 0.4, 1.05);
-  f_wheel_2 = new Cylinder(1.1, 0.4, -1.05);
-  r_wheel_1 = new Cylinder(-1.1, 0.8, 1.05);
-  r_wheel_2 = new Cylinder(-1.1, 0.8, -1.05);
-  chassis = new RectangularPrism(0, 0, 0.4);
-  //Create wheel sizes
-  f_wheel_1->set_radius(0.4);
-  f_wheel_1->set_y_length(0.1);
-  f_wheel_2->set_radius(0.4);
-  f_wheel_2->set_y_length(0.1);
-  r_wheel_1->set_radius(0.8);
-  r_wheel_1->set_y_length(0.1);
-  r_wheel_2->set_radius(0.8);
-  r_wheel_2->set_y_length(0.1);
-  //Set chassis sizes
-  chassis->set_x_length(3.0);
-  chassis->set_y_length(1.0);
-  chassis->set_z_length(2.0);
+
+  for(int i = 0; i < vehicleShapes.size(); i++){
+    //Add generic vehicle code
+  }
+
   glPopMatrix();
-  
+ 
 };
 */
+
 void MyVehicle::draw(){
+
+  double wheel_angular_v; 
 
   glPushMatrix();
   positionInGL();
 
+  for(int i = 0; i < 4; i++){
+       dynamic_cast<Wheel*>(shapes[i])->set_wheel_rotation(wheel_angle);
+    }
+  shapes[0]->setRotation(-getSteering());
+  shapes[1]->setRotation(-getSteering()+180);
   for(int i = 0; i < shapes.size(); i++){
-         shapes[i]->draw();
+      shapes[i]->draw();
   }
 
   glPopMatrix();
