@@ -10,6 +10,7 @@ class Wheel: public Shape{
 public:  
   Wheel();
   Wheel(double x_, double y_, double z_);
+  Wheel(double x_, double y_, double z_, bool);
   Wheel(double x_, double y_, double z_, double rotation_);
   Wheel(double x_, double y_, double z_, double rotation_, double wheel_rotation);
   void draw();

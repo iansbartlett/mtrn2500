@@ -1,0 +1,5 @@
+LIBS = -lGL -lGLU -lGLUT
+SRC = src/main.cpp
+INCDIR = -I include
+all:
+	g++ -o assign_2 $(SRC) $(LIBS) -g

@@ -9,7 +9,6 @@
 
 class Vehicle : public Shape {
 	friend void remoteDriver(Vehicle * vehicle, double x, double z, double r, double speed_, double steering_);
-        friend void update(Vehicle * vehicle);
 public:
 
 	Vehicle();
@@ -33,11 +32,9 @@ public:
 protected:
 	double speed;     // m/s
 	double steering;  // degrees
-        double wheel_angle;
-  
+
 	std::vector<Shape *> shapes;
 };
-
 
 double clamp(double a, double n, double b);
 

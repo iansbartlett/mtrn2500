@@ -10,12 +10,16 @@ class MyVehicle: public Vehicle {
 
 public:
   MyVehicle();
+  MyVehicle(bool);
   ~MyVehicle();
 
+  friend void update(MyVehicle);
+
   void draw();
+  void clearShapes();
 
 private:
-  
+
 };
 
 #endif

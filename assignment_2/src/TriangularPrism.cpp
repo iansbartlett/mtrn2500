@@ -42,6 +42,7 @@ void TriangularPrism::draw(){
   double top_x = side*cos(angle);
 
   glPushMatrix();
+  glTranslated(x,y,-z);
   glRotated(rotation,0,1,0);
   glTranslated(-x_length/2,0,-z_length/2);
   glColor3f(red, green, blue);

@@ -17,11 +17,22 @@ public:
 
   void set_radius(double new_radius);
   void set_y_length(double new_y_length);
+
+  double get_wheel_rotation();
+  void set_wheel_rotation(double new_wheel_rotation);
   
+  bool get_isRolling();
+  bool get_isSteering();
+
+  void set_isRolling(bool);
+  void set_isSteering(bool);
   ~Cylinder();
 protected:
   double  radius, y_length; 
   int slices;  
+  bool isRolling;
+  bool isSteering;
+  double wheel_rotation; 
 };
 
 

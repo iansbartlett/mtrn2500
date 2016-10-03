@@ -34,13 +34,6 @@
 #include "Shape.hpp"
 #include "Vehicle.hpp"
 
-//My includes
-#include "RectangularPrism.hpp"
-#include "TriangularPrism.hpp"
-#include "TrapezoidalPrism.hpp"
-#include "Cylinder.hpp"
-#include "MyVehicle.hpp"
-
 #include "RemoteDataManager.hpp"
 #include "Messages.hpp"
 #include "HUD.hpp"
@@ -71,18 +64,6 @@ int prev_mouse_y = -1;
 Vehicle * vehicle = NULL;
 double speed = 0;
 double steering = 0;
-
-//Testing HAX
-RectangularPrism * testBox = NULL;
-TrapezoidalPrism * testTrapezoid = NULL;
-TriangularPrism * testTriangle = NULL;
-Cylinder * testCylinder = NULL;
-
-
-TriangularPrism * tempTri;
-Cylinder * tempCyl;
-TrapezoidalPrism * tempTrap;
-RectangularPrism * tempRect;
 
 // default goal location
 std::deque<GoalState> goals;
@@ -126,33 +107,21 @@ int main(int argc, char ** argv) {
 	//   custom vehicle.
 	// -------------------------------------------------------------------------
 
-	vehicle = new MyVehicle();
+	//vehicle = new MyVehicle();
+
+
 	// add test obstacles
 	ObstacleManager::get()->addObstacle(Obstacle(10,10, 1));
 	ObstacleManager::get()->addObstacle(Obstacle(10,-10, 1));
 	ObstacleManager::get()->addObstacle(Obstacle(-10,10, 1));
 	ObstacleManager::get()->addObstacle(Obstacle(-10,-10, 1));
 
-        // Test rectangularPrism
-        //RectangularPrism testBox();
-        testBox = new RectangularPrism(10.0, 10.0, 10.0, 45);
-	testBox->setColor(0,0,1);
-	testBox->set_x_length(5.0);
-        testTrapezoid = new TrapezoidalPrism(0.0, 1.0, 3.0, 120);
-	testTrapezoid->setColor(0,1,0);
-	testBox->set_x_length(5.0);
-        testTriangle = new TriangularPrism(-1.0, 3.0, -2.0, 0);
-	testTriangle->setColor(1,0,0);
-	testBox->set_y_length(2.0);
-        testCylinder = new Cylinder(-2.0, 4.0, 2.0, -45);
-	testCylinder->setColor(1,1,0);
-	testCylinder->set_radius(4.0);
-	
 	// add test goal
 	GoalState g;
 	g.x = 25;
 	g.z = 0;
 	goals.push_back(g);
+
 
 	glutMainLoop();
 
@@ -165,9 +134,7 @@ int main(int argc, char ** argv) {
 
 void drawGoals()
 {
-
 	for (int i = 0; i < goals.size(); ++i) {
-
 		GoalState goal = goals[i];
 
 		glPushMatrix();
@@ -218,13 +185,13 @@ void display() {
 		vehicle->draw();
 
 	}
-        
+
 	// draw obstacles
 	ObstacleManager::get()->drawAll();
 
 	// draw goals
 	drawGoals();
-	
+
 	// draw HUD
 	HUD::Draw();
 
@@ -298,7 +265,6 @@ void idle() {
 
 	speed = 0;
 	steering = 0;
-	update(vehicle);
 
 	if (KeyManager::get()->isSpecialKeyPressed(GLUT_KEY_LEFT)) {
 		steering = Vehicle::MAX_LEFT_STEERING_DEGS * -1;   
@@ -330,7 +296,7 @@ void idle() {
 				otherVehicles.clear();
 
 				// uncomment this line to connect to the robotics server.
-				RemoteDataManager::Connect("www.robotics.unsw.edu.au","18081");
+				//RemoteDataManager::Connect("www.robotics.unsw.edu.au","18081");
 
 				// on connect, let's tell the server what we look like
 				if (RemoteDataManager::IsConnected()) {
@@ -372,76 +338,16 @@ void idle() {
 					// new models
 					case 'M':
 						{
-						  //cout << "Attempting to fetch models..." << endl;
 							std::vector<VehicleModel> models = GetVehicleModels(msg.payload);
 							for(unsigned int i = 0; i < models.size(); i++) {
-							  //cout << "Beginning model sweep " << i << endl;
-							  //cout << "Models should go up to " << models.size()-1 << endl;
 								VehicleModel vm = models[i];
-								//cout << "Model remote ID: " << vm.remoteID << endl;
-								otherVehicles[vm.remoteID] = new MyVehicle(false);
+								
+								// uncomment the line below to create remote vehicles
+								//otherVehicles[vm.remoteID] = new MyVehicle();
 
-								for (int j = 0; j < vm.shapes.size(); j++){
-
-								  //cout << "Iterating over shapes, iteration " << j << endl;
-							          //cout << "Shapes should go up to  " << vm.shapes.size()-1 << endl;
-								  double x = (double)vm.shapes[j].xyz[0];
-								  double y = (double)vm.shapes[j].xyz[1];
-								  double z = (double)vm.shapes[j].xyz[2];
-								  double rotation = (double)vm.shapes[j].rotation;
-								  double red = (double)vm.shapes[j].rgb[0];
-								  double blue = (double)vm.shapes[j].rgb[1];
-								  double green = (double)vm.shapes[j].rgb[2];
-
-								  switch(vm.shapes[j].type){
-								  case RECTANGULAR_PRISM:
-								    tempRect = new RectangularPrism(x,y,z,rotation);
-								    tempRect->set_x_length(vm.shapes[j].params.rect.xlen);
-								    tempRect->set_y_length(vm.shapes[j].params.rect.ylen);
-								    tempRect->set_z_length(vm.shapes[j].params.rect.zlen);
-								    tempRect->setColor(red, blue, green);
-								    otherVehicles[vm.remoteID]->addShape(tempRect);
-								    break;
-								  case TRIANGULAR_PRISM:
-								    tempTri = new TriangularPrism(x,y,z,rotation);
-								    tempTri->set_x_length(vm.shapes[j].params.tri.alen);
-								    tempTri->set_side(vm.shapes[j].params.tri.blen);
-								    tempTri->set_angle(vm.shapes[j].params.tri.angle*M_PI/180);
-								    tempTri->set_z_length(vm.shapes[j].params.tri.depth);
-								    tempTri->setColor(red, blue, green);
-								    otherVehicles[vm.remoteID]->addShape(tempTri);
-								    break;
-								  case TRAPEZOIDAL_PRISM:
-								    tempTrap = new TrapezoidalPrism(x,y,z,rotation);
-								    tempTrap->set_bottom_x_length(vm.shapes[j].params.trap.alen);
-								    tempTrap->set_top_x_length(vm.shapes[j].params.trap.blen);
-								    tempTrap->set_y_length(vm.shapes[j].params.trap.height);
-								    tempTrap->set_offset(vm.shapes[j].params.trap.aoff);
-								    tempTrap->set_z_length(vm.shapes[j].params.trap.depth);
-								    tempTrap->setColor(red, blue, green);
-								    otherVehicles[vm.remoteID]->addShape(tempTrap);
-								    break;
-								  case CYLINDER:
-								    tempCyl = new Cylinder(x,y,z,rotation);
-								    tempCyl->set_radius(vm.shapes[j].params.cyl.radius);
-								    tempCyl->set_y_length(vm.shapes[j].params.cyl.depth);
-								    tempCyl->set_isSteering(vm.shapes[j].params.cyl.isSteering);
-								    tempCyl->set_isRolling(vm.shapes[j].params.cyl.isRolling);
-								    tempCyl->setColor(red, blue, green);
-								    otherVehicles[vm.remoteID]->addShape(tempCyl);
-								    break;
-								  default:
-								    cout << "Switch statement error!" << endl;
-								    tempRect = new RectangularPrism(0,0,0);
-								    //tempRect->set_x_length(vm.shapes[j].params.rect.xlen);
-								    //tempRect->set_y_length(vm.shapes[j].params.rect.ylen);
-								    //tempRect->set_z_length(vm.shapes[j].params.rect.zlen);
-								    tempRect->setColor(1, 1, 1);
-								    otherVehicles[vm.remoteID]->addShape(tempRect);
-								    }
-								  //cout << "Exited switch successfully" << endl;
-								}
-								//cout << "ended model sweep" << endl;
+								//
+								// more student code goes here
+								//
 							}
 							break;
 						}
@@ -480,7 +386,7 @@ void idle() {
 							break;
 						}
 
-					// disconnectlist
+					// disconnect list
 					case 'D':
 						{
 							std::vector<int> disconnectedIDs = GetVehicleDisconnects(msg.payload);
@@ -592,94 +498,4 @@ void motion(int x, int y) {
 	prev_mouse_y = y;
 };
 
-void update(Vehicle * car){
-    //Find forces due to obstacles
-    double F_x = 0;
-    double F_z = 0;
-    //double vehicle_x = vehicle.getX;
-    //double vehicle_y = vehicle.getY;
-    double vehicle_v_x; //UNDEFINED 
-    double vehicle_v_z; //UNDEFINED 
-    GoalState nextGoal;
-    double goal_dx;
-    double goal_dz;
-    double goal_dist;
-    double angle;
-
-    std::list<Obstacle> obstacles = ObstacleManager::get()->getObstacles(car->x, car->z, 100);
-    for (std::list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); it++) {
-		    double dx = (it->getX() - car->x);
-		    double dz = (it->getZ() - car->z);
-		    //F_x = F_x + 0*dx/pow(dx,3);
-		    //F_z = F_z + 0*dz/pow(dz,3);
-		    //cout << "Checked obstacle " << endl;
-		    //cout << "Distances: " << dx << " " << dz << endl;
-    }
-
-    //Pop goal, check distance, if less than 10 move on to next goal
-    do{
-    nextGoal = goals.front();
-    goals.pop_front();
-    goal_dx = (nextGoal.x-car->x);
-    goal_dz = -(nextGoal.z-car->z);
-    goal_dist = sqrt(pow(goal_dx,2)+pow(goal_dz,2));
-    cout << "Goal distance: " << goal_dist << endl;
-    }while(goal_dist < 10.0);
-    goals.push_front(nextGoal);
-
-    //Find forces due to goals
-    cout << "Goal dx :" << goal_dx << endl;
-    cout << "Goal dz :" << goal_dz << endl;
-    if(goal_dx != 0.0){
-      F_x = F_x - goal_dx*abs(1/pow(goal_dx,3));
-    }else{
-      F_x = 0;
-    }
-
-    //cout << "F_z before update: " << F_z << endl;
-    //cout << "Goal dz :" << goal_dz << endl;
-    if(goal_dz != 0.0){
-      F_z = F_z - goal_dz*abs(1/pow(goal_dz,3));
-    }else{
-      F_z = 0;
-    }
-    //cout << "F_z after update: " << F_z << endl;
-
-    //Attempt to align vehicle vector with force vector 
-    vehicle_v_x = car->speed * cos(car->rotation * M_PI/180.0);
-    vehicle_v_z = car->speed * sin(car->rotation * M_PI/180.0);
-
-    cout << "ANGLE DEBUG........................." << endl;
-    cout << "Car rotation value: " << vehicle->getRotation() << endl;
-    cout << "Car angle: " << (180-car->rotation) << endl;
-    cout << "Force angle: " << atan(F_z/F_x)*180/M_PI << endl;
-    angle = (atan(F_z/F_x)*180/M_PI)+(180-car->rotation);
-    cout << "Angle error: " << angle <<  endl;
-    cout << "........................." << endl;
-
-    //Debug outputs
-    cout << "Goal coords: " << nextGoal.x << " " << nextGoal.z << endl;
-    cout << "Vehicle coords: " << car->x << " " << car->z << endl;
-    cout << "Force vector: " << F_x << " " << F_z << endl;
-
-    //steering
-    /*
-    if(angle*180/M_PI < 15){ 
-    cout << "Steering angle: " << -sin(angle)*15 << endl;
-    car->steering = -sin(angle)*15;
-    }else{
-    cout << "Steering angle maxed" << endl;
-    car->steering = 15;
-    }
-    if(angle > 0.05){
-       car->steering = 15;
-    }else if(angle < -0.05){
-       car->steering = -15;
-    }else{
-       car->steering = 0;
-    }
-    cout << "Drive: " << abs(cos(angle)*10.0) << endl;
-    car->speed = abs(cos(angle)*9.0)+1;
-    */
-}
 

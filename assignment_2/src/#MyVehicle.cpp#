@@ -80,7 +80,7 @@ void MyVehicle::draw(){
   for(int i = 0; i < shapes.size(); i++){
     glPushMatrix();
     if(dynamic_cast<Cylinder*>(shapes[i])){
-      dynamic_cast<Cylinder*>(shapes[i])->set_wheel_rotation(-speed/dynamic_cast<Cylinder*>(shapes[i])->get_radius()+dynamic_cast<Cylinder*>(shapes[i])->get_wheel_rotation());
+      dynamic_cast<Cylinder*>(shapes[i])->set_wheel_rotation(speed/dynamic_cast<Cylinder*>(shapes[i])->get_radius()+gdynamic_cast<Cylinder*>(shapes[i])->et_wheel_rotation());
       if(dynamic_cast<Cylinder*>(shapes[i])->get_isSteering()){
 	glRotated(-getSteering(),0,1,1);
       }

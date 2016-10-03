@@ -48,12 +48,16 @@ Wheel::Wheel(double x_, double y_, double z_): Shape(x_, y_, z_){
   wheel_rotation = 0;
 };
 
+Wheel::Wheel(double x_, double y_, double z_, bool custom): Shape(x_, y_, z_){
+  wheel_rotation = 0;
+};
+
 Wheel::Wheel(double x_, double y_, double z_, double rotation_):
   Shape(x_, y_, z_, rotation_){
   addShape(new Cylinder());
   addShape(new RectangularPrism(0.05, 0.0, 0.1));
   dynamic_cast<Cylinder*>(shapes[0])->set_radius(0.4);
-  dynamic_cast<Cylinder*>(shapes[0])->set_y_length(0.1);
+ dynamic_cast<Cylinder*>(shapes[0])->set_y_length(0.1);
   dynamic_cast<RectangularPrism*>(shapes[1])->set_x_length(0.1);
   dynamic_cast<RectangularPrism*>(shapes[1])->set_y_length(0.4);
   dynamic_cast<RectangularPrism*>(shapes[1])->set_z_length(0.2);

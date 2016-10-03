@@ -1,0 +1,13 @@
+#+TITLE: Todos for Assignment 2
+
+* TODO Work out how to check if something is the right type
+
+* TODO Implement custom wheels option
+
+* TODO Restore and test wheel turning 
+
+* TODO Edit reciever code to include turning wheels 
+
+* TODO Transmit current vehicle configuration
+
+* TODO Guidance code
