@@ -1,6 +1,7 @@
 #include "MyVehicle.hpp"
 #include "Wheel.hpp"
 #include "RectangularPrism.hpp"
+#include "TriangularPrism.hpp"
 #include "Shape.hpp"
 
 #include <GL/gl.h>
@@ -12,6 +13,53 @@ using namespace std;
 MyVehicle::MyVehicle() : Vehicle() {
   glPushMatrix(); 
   //Create basic structures
+  //Assessment code goes here
+  addShape(new RectangularPrism(0, 0.57,0));
+  dynamic_cast<RectangularPrism*>(shapes[0])->set_x_length(1.28);
+  dynamic_cast<RectangularPrism*>(shapes[0])->set_y_length(0.09);
+  dynamic_cast<RectangularPrism*>(shapes[0])->set_z_length(3.84);
+  shapes[0]->setColor(1.0,0.82,0.51);
+  
+  addShape(new RectangularPrism(0, (0.57+0.09), ((-3.84/2)+0.14+(1.18/2))));
+  dynamic_cast<RectangularPrism*>(shapes[1])->set_x_length(1.18);
+  dynamic_cast<RectangularPrism*>(shapes[1])->set_y_length(0.65);
+  dynamic_cast<RectangularPrism*>(shapes[1])->set_z_length(1.01);
+  shapes[1]->setColor(1.0,0.1,0.0);
+
+  addShape(new Cylinder(((1.28/2)+0.16), 0, -1.34));
+  dynamic_cast<Cylinder*>(shapes[2])->set_isRolling(true);
+  dynamic_cast<Cylinder*>(shapes[2])->set_radius(0.78/2);
+  dynamic_cast<Cylinder*>(shapes[2])->set_y_length(0.22);
+  dynamic_cast<Cylinder*>(shapes[2])->setRotation(90);
+  shapes[2]->setColor(0.0,0.0,0.0);
+
+  addShape(new Cylinder(-((1.28/2)+0.16), 0, -1.34));
+  dynamic_cast<Cylinder*>(shapes[3])->set_isRolling(true);
+  dynamic_cast<Cylinder*>(shapes[3])->set_radius(0.78/2);
+  dynamic_cast<Cylinder*>(shapes[3])->set_y_length(0.22);
+  dynamic_cast<Cylinder*>(shapes[3])->setRotation(90);
+  shapes[3]->setColor(0.0,0.0,0.0);
+
+  addShape(new Cylinder(((1.28/2)+0.16+0.23), (0.78-0.35)/2, -1.34));
+  dynamic_cast<Cylinder*>(shapes[4])->set_isRolling(true);
+  dynamic_cast<Cylinder*>(shapes[4])->set_radius(0.35/2);
+  dynamic_cast<Cylinder*>(shapes[4])->set_y_length(0.06);
+  dynamic_cast<Cylinder*>(shapes[4])->setRotation(90);
+  shapes[4]->setColor(1.0,1.0,0.0);
+
+  addShape(new Cylinder(-((1.28/2)+0.16+0.23), (0.78-0.35)/2, -1.34));
+  dynamic_cast<Cylinder*>(shapes[5])->set_isRolling(true);
+  dynamic_cast<Cylinder*>(shapes[5])->set_radius(0.35/2);
+  dynamic_cast<Cylinder*>(shapes[5])->set_y_length(0.06);
+  dynamic_cast<Cylinder*>(shapes[5])->setRotation(90);
+  shapes[5]->setColor(1.0,1.0,0.0);
+
+  addShape(new TriangularPrism(0, 0.57, -(3.84/2-0.17)));
+  dynamic_cast<TriangularPrism*>(shapes[6])->setRotation(90);
+  dynamic_cast<TriangularPrism*>(shapes[6])->set_angle(-atan(0.57/0.17));
+
+  ///////////////////////
+  /*
   addShape(new Cylinder(1.1, 0.4, 1.05));
   addShape(new Cylinder(1.1, 0.4, -1.05));
   addShape(new Cylinder(-1.1, 0.4, 1.05));
@@ -43,6 +91,7 @@ MyVehicle::MyVehicle() : Vehicle() {
   shapes[2]->setColor(0,0,1);
   shapes[3]->setColor(0,0,1);
 
+  */
   wheel_angle = 0;
   
   glPopMatrix();
@@ -78,16 +127,11 @@ void MyVehicle::draw(){
   //shapes[0]->setRotation(-getSteering());
   //shapes[1]->setRotation(-getSteering()+180);
   for(int i = 0; i < shapes.size(); i++){
-    glPushMatrix();
     if(dynamic_cast<Cylinder*>(shapes[i])){
-      dynamic_cast<Cylinder*>(shapes[i])->set_wheel_rotation(speed/dynamic_cast<Cylinder*>(shapes[i])->get_radius()+gdynamic_cast<Cylinder*>(shapes[i])->et_wheel_rotation());
-      if(dynamic_cast<Cylinder*>(shapes[i])->get_isSteering()){
-	glRotated(-getSteering(),0,1,1);
-      }
+     dynamic_cast<Cylinder*>(shapes[i])->set_wheel_rotation(-speed/dynamic_cast<Cylinder*>(shapes[i])->get_radius()+dynamic_cast<Cylinder*>(shapes[i])->get_wheel_rotation());
+     dynamic_cast<Cylinder*>(shapes[i])->set_steering_angle((double)getSteering());
      }
-      //cout << "Attempting to print shape " << i+1 << " of " << shapes.size() << endl;
       shapes[i]->draw();
-      glPopMatrix();
   }
 
   glPopMatrix();
@@ -97,6 +141,10 @@ void MyVehicle::draw(){
 
 void MyVehicle::clearShapes(){
   shapes.clear();
+}
+
+std::vector<Shape *> MyVehicle::returnShapes(){
+  return shapes;
 }
 
 MyVehicle::~MyVehicle(){

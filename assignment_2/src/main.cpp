@@ -59,6 +59,8 @@ void mouse(int button, int state, int x, int y);
 void dragged(int x, int y);
 void motion(int x, int y);
 
+bool autopilot_on = false;
+
 using namespace std;
 using namespace scos;
 
@@ -298,7 +300,9 @@ void idle() {
 
 	speed = 0;
 	steering = 0;
-	update(vehicle);
+	if(autopilot_on){
+	    update(vehicle);
+	}
 
 	if (KeyManager::get()->isSpecialKeyPressed(GLUT_KEY_LEFT)) {
 		steering = Vehicle::MAX_LEFT_STEERING_DEGS * -1;   
@@ -342,6 +346,48 @@ void idle() {
 					//
 					// student code goes here
 					//
+					
+					std::vector<Shape *> shapesList = dynamic_cast<MyVehicle*>(vehicle)->returnShapes();
+					for(int i = 0; i < shapesList.size(); i++){
+					  ShapeInit temp = {};
+				          temp.rgb[0] = shapesList[i]->getRed(); 
+				          temp.rgb[1] = shapesList[i]->getGreen(); 
+				          temp.rgb[2] = shapesList[i]->getBlue(); 
+				          temp.xyz[0] = shapesList[i]->getX(); 
+				          temp.xyz[1] = shapesList[i]->getY(); 
+				          temp.xyz[2] = shapesList[i]->getZ(); 
+
+					  if(dynamic_cast<RectangularPrism*>(shapesList[i])){
+					    temp.type = RECTANGULAR_PRISM;
+					    temp.params.rect.xlen = (float)dynamic_cast<RectangularPrism*>(shapesList[i])->get_x_length();
+					    temp.params.rect.ylen = (float)dynamic_cast<RectangularPrism*>(shapesList[i])->get_y_length();
+					    temp.params.rect.zlen = (float)dynamic_cast<RectangularPrism*>(shapesList[i])->get_z_length();
+					    vm.shapes.push_back(temp);
+					  }else if(dynamic_cast<TriangularPrism*>(shapesList[i])){
+					    temp.type = TRIANGULAR_PRISM;
+					    temp.params.tri.alen = (float)dynamic_cast<TriangularPrism*>(shapesList[i])->get_x_length();
+					    temp.params.tri.blen = (float)dynamic_cast<TriangularPrism*>(shapesList[i])->get_side();
+					    temp.params.tri.depth = (float)dynamic_cast<TriangularPrism*>(shapesList[i])->get_z_length();
+					    temp.params.tri.angle = (float)dynamic_cast<TriangularPrism*>(shapesList[i])->get_angle()*180/M_PI;
+					    vm.shapes.push_back(temp);
+					  }else if(dynamic_cast<TrapezoidalPrism*>(shapesList[i])){
+					    temp.type = TRAPEZOIDAL_PRISM;
+					    temp.params.trap.alen = (float)dynamic_cast<TrapezoidalPrism*>(shapesList[i])->get_bottom_x_length();
+					    temp.params.trap.blen = (float)dynamic_cast<TrapezoidalPrism*>(shapesList[i])->get_top_x_length();
+					    temp.params.trap.height = (float)dynamic_cast<TrapezoidalPrism*>(shapesList[i])->get_y_length();
+					    temp.params.trap.aoff = (float)dynamic_cast<TrapezoidalPrism*>(shapesList[i])->get_offset();
+					    temp.params.trap.depth = (float)dynamic_cast<TrapezoidalPrism*>(shapesList[i])->get_z_length();
+					    vm.shapes.push_back(temp);
+					  }else if(dynamic_cast<Cylinder*>(shapesList[i])){
+					    temp.type = CYLINDER;
+					    temp.params.cyl.depth = (float)dynamic_cast<Cylinder*>(shapesList[i])->get_y_length();
+					    temp.params.cyl.radius = (float)dynamic_cast<Cylinder*>(shapesList[i])->get_radius();
+					    temp.params.cyl.isRolling = dynamic_cast<Cylinder*>(shapesList[i])->get_isRolling();
+					    temp.params.cyl.isSteering = dynamic_cast<Cylinder*>(shapesList[i])->get_isSteering();
+					    vm.shapes.push_back(temp);
+					  }
+
+					}
 
 					RemoteDataManager::Write(GetVehicleModelStr(vm));
 				}
@@ -431,7 +477,7 @@ void idle() {
 								    otherVehicles[vm.remoteID]->addShape(tempCyl);
 								    break;
 								  default:
-								    cout << "Switch statement error!" << endl;
+								    //cout << "Switch statement error!" << endl;
 								    tempRect = new RectangularPrism(0,0,0);
 								    //tempRect->set_x_length(vm.shapes[j].params.rect.xlen);
 								    //tempRect->set_y_length(vm.shapes[j].params.rect.ylen);
@@ -550,6 +596,9 @@ void keydown(unsigned char key, int x, int y) {
 	case 'p':
 		Camera::get()->togglePursuitMode();
 		break;
+	case 'z':
+	        autopilot_on = !autopilot_on;
+		break;
 	}
 
 };
@@ -598,20 +647,21 @@ void update(Vehicle * car){
     double F_z = 0;
     //double vehicle_x = vehicle.getX;
     //double vehicle_y = vehicle.getY;
-    double vehicle_v_x; //UNDEFINED 
-    double vehicle_v_z; //UNDEFINED 
+    double vehicle_v_x;
+    double vehicle_v_z;
     GoalState nextGoal;
     double goal_dx;
     double goal_dz;
     double goal_dist;
     double angle;
+    double angle_cos;
 
-    std::list<Obstacle> obstacles = ObstacleManager::get()->getObstacles(car->x, car->z, 100);
+    std::list<Obstacle> obstacles = ObstacleManager::get()->getObstacles(car->x, car->z, 10);
     for (std::list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); it++) {
 		    double dx = (it->getX() - car->x);
-		    double dz = (it->getZ() - car->z);
-		    //F_x = F_x + 0*dx/pow(dx,3);
-		    //F_z = F_z + 0*dz/pow(dz,3);
+		    double dz = -(it->getZ() - car->z);
+		    F_x = F_x + 0.0*dx/pow(dx,3);
+		    F_z = F_z + 0.0*dz/pow(dz,3);
 		    //cout << "Checked obstacle " << endl;
 		    //cout << "Distances: " << dx << " " << dz << endl;
     }
@@ -623,13 +673,13 @@ void update(Vehicle * car){
     goal_dx = (nextGoal.x-car->x);
     goal_dz = -(nextGoal.z-car->z);
     goal_dist = sqrt(pow(goal_dx,2)+pow(goal_dz,2));
-    cout << "Goal distance: " << goal_dist << endl;
+    //cout << "Goal distance: " << goal_dist << endl;
     }while(goal_dist < 10.0);
     goals.push_front(nextGoal);
 
     //Find forces due to goals
-    cout << "Goal dx :" << goal_dx << endl;
-    cout << "Goal dz :" << goal_dz << endl;
+    //cout << "Goal dx :" << goal_dx << endl;
+    //cout << "Goal dz :" << goal_dz << endl;
     if(goal_dx != 0.0){
       F_x = F_x - goal_dx*abs(1/pow(goal_dx,3));
     }else{
@@ -646,21 +696,27 @@ void update(Vehicle * car){
     //cout << "F_z after update: " << F_z << endl;
 
     //Attempt to align vehicle vector with force vector 
-    vehicle_v_x = car->speed * cos(car->rotation * M_PI/180.0);
+    vehicle_v_x = -car->speed * cos(car->rotation * M_PI/180.0);
     vehicle_v_z = car->speed * sin(car->rotation * M_PI/180.0);
 
-    cout << "ANGLE DEBUG........................." << endl;
-    cout << "Car rotation value: " << vehicle->getRotation() << endl;
-    cout << "Car angle: " << (180-car->rotation) << endl;
-    cout << "Force angle: " << atan(F_z/F_x)*180/M_PI << endl;
-    angle = (atan(F_z/F_x)*180/M_PI)+(180-car->rotation);
-    cout << "Angle error: " << angle <<  endl;
-    cout << "........................." << endl;
+    //cout << "ANGLE DEBUG........................." << endl;
+    //cout << "Car rotation value: " << vehicle->getRotation() << endl;
+    //cout << "Car angle: " << (180-car->rotation) << endl;
+    //cout << "Force angle: " << atan(F_z/F_x)*180/M_PI << endl;
+    //angle = (atan(F_z/F_x)*180/M_PI)+(180-car->rotation);
+    if(car->speed > 0){
+      angle_cos = ((F_x*vehicle_v_x)+(F_z*vehicle_v_z))/abs((sqrt(pow(F_x,2)+pow(F_z,2))*car->speed));
+    }else{
+      angle_cos = 1;
+    }
+    //cout << "Angle error: " << angle <<  endl;
+    //cout << "........................." << endl;
 
     //Debug outputs
     cout << "Goal coords: " << nextGoal.x << " " << nextGoal.z << endl;
-    cout << "Vehicle coords: " << car->x << " " << car->z << endl;
+    //cout << "Vehicle coords: " << car->x << " " << car->z << endl;
     cout << "Force vector: " << F_x << " " << F_z << endl;
+    cout << "Velocity vector" << vehicle_v_x << " " << vehicle_v_z << endl;
 
     //steering
     /*
@@ -671,15 +727,17 @@ void update(Vehicle * car){
     cout << "Steering angle maxed" << endl;
     car->steering = 15;
     }
-    if(angle > 0.05){
+    */
+    cout << "Angle cos: " << angle_cos << endl;
+    if(angle_cos+1 < 0.95 ){
        car->steering = 15;
-    }else if(angle < -0.05){
+    }else if(angle_cos+1 > 1.05 ){
        car->steering = -15;
     }else{
        car->steering = 0;
     }
-    cout << "Drive: " << abs(cos(angle)*10.0) << endl;
-    car->speed = abs(cos(angle)*9.0)+1;
-    */
+    cout << "Steering" << car->steering << endl;
+    cout << "Drive: " << abs(angle_cos*10.0) << endl;
+    car->speed = abs(6.0)+4;
 }
 

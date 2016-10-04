@@ -19,7 +19,7 @@
 
 #include <math.h>
 
-#define DEFAULT_SLICES 6
+#define DEFAULT_SLICES 10
 
 Cylinder::Cylinder(): Shape(){
   y_length = 1;
@@ -27,6 +27,7 @@ Cylinder::Cylinder(): Shape(){
   slices = DEFAULT_SLICES;
   bool isRolling = false;
   bool isSteering = false;
+  steering_angle = 0.0;
 };
 
 Cylinder::Cylinder(double x_, double y_, double z_): Shape(x_, y_, z_){
@@ -35,6 +36,7 @@ Cylinder::Cylinder(double x_, double y_, double z_): Shape(x_, y_, z_){
   slices = DEFAULT_SLICES; 
   bool isRolling = false;
   bool isSteering = false;
+  steering_angle = 0.0;
 };
 
 Cylinder::Cylinder(double x_, double y_, double z_, double rotation_):
@@ -44,6 +46,7 @@ Cylinder::Cylinder(double x_, double y_, double z_, double rotation_):
   slices = DEFAULT_SLICES;
   bool isRolling = false;
   bool isSteering = false;
+  steering_angle = 0.0;
 };
 
 void Cylinder::draw(){
@@ -54,6 +57,9 @@ void Cylinder::draw(){
   glTranslated(x,y,z);
   glRotated(-90, 1, 0, 0);
   glTranslated(0,0,radius);
+  if(isSteering){
+    glRotated((-steering_angle),0,0,1);
+  }
   if(isRolling){
     glRotated((-wheel_rotation),0,1,0);
   }
@@ -97,19 +103,19 @@ void Cylinder::set_y_length(double new_y_length){
 
 void Cylinder::set_isRolling(bool rolling){
   isRolling = rolling;
-}
+};
 
 void Cylinder::set_isSteering(bool steering){
   isSteering = steering;
-}
+};
 
 bool Cylinder::get_isRolling(){
   return isRolling;
-}
+};
 
 bool Cylinder::get_isSteering(){
   return isSteering;
-}
+};
 
 double Cylinder::get_wheel_rotation(){
   return wheel_rotation; 
@@ -119,6 +125,13 @@ void Cylinder::set_wheel_rotation(double new_wheel_rotation){
   wheel_rotation = new_wheel_rotation;
 };
 
+double Cylinder::get_steering_angle(){
+  return steering_angle;
+};
+
+void Cylinder::set_steering_angle(double steering_angle_){
+  steering_angle = steering_angle_;
+};
 
 Cylinder::~Cylinder(){
 

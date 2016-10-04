@@ -46,8 +46,8 @@ void TrapezoidalPrism::draw(){
   //Front face 
   glVertex3f(0, 0, 0);
   glVertex3f(offset, y_length, 0);
-  glVertex3f(bottom_x_length, 0, 0);
   glVertex3f(top_x_length+offset, y_length, 0);
+  glVertex3f(bottom_x_length, 0, 0);
   //Back face 
   glVertex3f(0, 0, z_length);
   glVertex3f(offset, y_length, z_length);

@@ -21,18 +21,23 @@ public:
   double get_wheel_rotation();
   void set_wheel_rotation(double new_wheel_rotation);
   
+  double get_steering_angle();
+  void set_steering_angle(double steering_angle_);
+
   bool get_isRolling();
   bool get_isSteering();
 
   void set_isRolling(bool);
   void set_isSteering(bool);
   ~Cylinder();
+
 protected:
   double  radius, y_length; 
   int slices;  
   bool isRolling;
   bool isSteering;
   double wheel_rotation; 
+  double steering_angle;
 };
 
 

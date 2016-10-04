@@ -18,8 +18,8 @@ public:
   void draw();
   void clearShapes();
 
+  std::vector<Shape *> returnShapes();
 private:
-
 };
 
 #endif
